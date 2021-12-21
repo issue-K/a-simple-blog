@@ -9,14 +9,30 @@
         <result property="locked" column="locked"/>
     </resultMap>
 
+    <update id="updateUser">
+        update tb_admin_user
+        set login_user_name = #{loginUserName},
+            login_password = #{loginPassword},
+            nick_name = #{nickName},
+            locked = #{locked}
+        where admin_user_id = #{adminUserId}
+    </update>
+
     <select id="login" resultMap="UserResult">
         select * from tb_admin_user
         where login_password=#{password} and login_user_name=#{userName} and locked=0
         limit 1
     </select>
 
+    <select id="getUserById" resultMap="UserResult">
+        select * from tb_admin_user
+        where admin_user_id=#{loginUserId} and locked=0
+        limit 1
+    </select>
+
     <insert id="registry">
         insert into tb_admin_user (login_user_name,login_password,nick_name ) values( #{userName},#{password},#{nickname} )
     </insert>
+
 
 </mapper>
