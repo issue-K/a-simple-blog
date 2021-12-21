@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.cl.smyblog.dao.AdminUserMapper">
+    <resultMap type="com.cl.smyblog.entity.AdminUser" id="UserResult">
+        <result property="adminUserId" column="admin_user_id"/>
+        <result property="loginUserName" column="login_user_name"/>
+        <result property="loginPassword" column="login_password"/>
+        <result property="nickName" column="nick_name"/>
+        <result property="locked" column="locked"/>
+    </resultMap>
+
+    <select id="login" resultMap="UserResult">
+        select * from tb_admin_user
+        where login_password=#{password} and login_user_name=#{userName} and locked=0
+        limit 1
+    </select>
+
+    <insert id="registry">
+        insert into tb_admin_user (login_user_name,login_password,nick_name ) values( #{userName},#{password},#{nickname} )
+    </insert>
+
+</mapper>
