@@ -9,9 +9,21 @@
         <result column="is_deleted" property="isDeleted"/>
         <result column="create_time" property="createTime"/>
     </resultMap>
-    <insert id="TotalBlogCategory">
+    <select id="TotalBlogCategory" resultType="int">
         select count(*) from tb_blog_category
-    </insert>
+        where is_deleted=0
+    </select>
+
+    <update id="updateById">
+        update tb_blog_category
+        set category_rank=#{categoryRank}
+        where category_id=#{categoryId} and is_deleted=0
+    </update>
+
+    <select id="selectById" resultMap="BaseResultMap">
+        select * from tb_blog_category
+        where category_id=#{blogCategoryId} and is_deleted=0
+    </select>
 
     <select id="BlogCategoryPages" resultMap="BaseResultMap">
         select * from tb_blog_category

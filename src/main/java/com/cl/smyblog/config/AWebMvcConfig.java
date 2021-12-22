@@ -15,8 +15,8 @@ public class AWebMvcConfig implements WebMvcConfigurer {
 
     @Override
     public void addInterceptors(InterceptorRegistry registry) {
-        registry.addInterceptor( adminLoginInterceptor ).addPathPatterns("/admin/**").excludePathPatterns("/admin/login")
-                .excludePathPatterns("/admin/dist/**").excludePathPatterns("/admin/plugins/**");
+    //    registry.addInterceptor( adminLoginInterceptor ).addPathPatterns("/admin/**").excludePathPatterns("/admin/login")
+    //            .excludePathPatterns("/admin/dist/**").excludePathPatterns("/admin/plugins/**");
     }
 
     public void addResourceHandlers(ResourceHandlerRegistry registry) {

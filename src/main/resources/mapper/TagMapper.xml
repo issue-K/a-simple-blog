@@ -1,0 +1,85 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.cl.smyblog.dao.TagMapper">
+    <resultMap id="BaseResultMap" type="com.cl.smyblog.entity.Tag">
+        <id column="tag_id" property="tagId"/>
+        <result column="tag_name" property="tagName"/>
+        <result column="is_deleted" property="isDeleted"/>
+        <result column="create_time" property="createTime"/>
+    </resultMap>
+
+    <sql id="Base_Column_List">
+        tag_id, tag_name, is_deleted, create_time
+    </sql>
+
+    <select id="selectByTagName" resultMap="BaseResultMap">
+        select * from tb_blog_tag
+        where tag_name=#{tagName}
+    </select>
+
+<!--    <insert id="getTotal">-->
+<!--        select count(*) from tb_blog_tag-->
+<!--        where is_deleted=0-->
+<!--    </insert>-->
+    <select id="getTotal" parameterType="Map" resultType="int">
+        select count(*) from tb_blog_tag
+        where is_deleted=0
+    </select>
+
+    <insert id="insertTagList" parameterType="java.util.List" useGeneratedKeys="true"
+            keyProperty="tagId">
+        insert into tb_blog_tag(tag_name)
+        values
+        <foreach collection="list" item="item" separator=",">
+            (#{item.tagName})
+        </foreach>
+    </insert>
+
+    <select id="selectTagPage" resultMap="BaseResultMap">
+        select * from tb_blog_tag
+        where is_deleted=0
+        limit #{start},#{limit}
+    </select>
+
+    <update id="deleteTagList">
+        update tb_blog_tag
+        set is_deleted=1
+        where tag_id in
+        <foreach collection="array" index="index" item="item"
+                 open="(" separator="," close=")">
+            #{item}
+        </foreach>
+    </update>
+
+    <insert id="insertTag" parameterType="com.cl.smyblog.entity.Tag">
+        insert into tb_blog_tag
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="tagId != null">
+                tag_id,
+            </if>
+            <if test="tagName != null">
+                tag_name,
+            </if>
+            <if test="isDeleted != null">
+                is_deleted,
+            </if>
+            <if test="createTime != null">
+                create_time,
+            </if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="tagId != null">
+                #{tagId,jdbcType=INTEGER},
+            </if>
+            <if test="tagName != null">
+                #{tagName,jdbcType=VARCHAR},
+            </if>
+            <if test="isDeleted != null">
+                #{isDeleted,jdbcType=TINYINT},
+            </if>
+            <if test="createTime != null">
+                #{createTime,jdbcType=TIMESTAMP},
+            </if>
+        </trim>
+    </insert>
+</mapper>

@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.cl.smyblog.dao.BlogTagRelationMapper">
+    <resultMap id="BaseResultMap" type="com.cl.smyblog.entity.BlogTagRelation">
+        <id column="relation_id" jdbcType="BIGINT" property="relationId"/>
+        <result column="blog_id" jdbcType="BIGINT" property="blogId"/>
+        <result column="tag_id" jdbcType="INTEGER" property="tagId"/>
+        <result column="create_time" jdbcType="TIMESTAMP" property="createTime"/>
+    </resultMap>
+
+    <insert id="insertBatch">
+        insert tb_blog_tag_relation(blog_id,tag_id)
+        VALUES
+        <foreach collection="list" item="item" separator=",">
+            (#{item.blogId},#{item.tagId})
+        </foreach>
+    </insert>
+</mapper>

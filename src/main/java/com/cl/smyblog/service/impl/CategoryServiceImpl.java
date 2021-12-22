@@ -31,6 +31,13 @@ public class CategoryServiceImpl implements CategoryService {
     }
 
     @Override
+    public List<BlogCategory> getAllCategories() {
+        int total = blogCategoryMapper.TotalBlogCategory();
+        System.out.println("查询到"+total);
+        return blogCategoryMapper.BlogCategoryPages( 0,total );
+    }
+
+    @Override
     public PageResult getBlogCategoryPage(PageQueryUtil pageUtil) {
         int totalsize = blogCategoryMapper.TotalBlogCategory();//总共数据
         int pagesize = pageUtil.getLimit();//一页几条数据
