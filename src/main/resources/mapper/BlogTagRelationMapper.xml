@@ -15,4 +15,9 @@
             (#{item.blogId},#{item.tagId})
         </foreach>
     </insert>
+
+    <delete id="deleteByBlogId" parameterType="java.lang.Long">
+        delete from tb_blog_tag_relation
+        where blog_id = #{blogId}
+    </delete>
 </mapper>

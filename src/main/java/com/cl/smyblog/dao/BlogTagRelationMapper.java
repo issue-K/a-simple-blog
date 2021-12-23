@@ -6,4 +6,6 @@ import java.util.List;
 
 public interface BlogTagRelationMapper {
     int insertBatch(List<BlogTagRelation> li);
+
+    void deleteByBlogId(Long blogId);
 }

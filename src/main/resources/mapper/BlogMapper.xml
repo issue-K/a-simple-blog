@@ -8,6 +8,7 @@
         <result column="blog_cover_image" jdbcType="VARCHAR" property="blogCoverImage"/>
         <result column="blog_category_id" jdbcType="INTEGER" property="blogCategoryId"/>
         <result column="blog_category_name" jdbcType="VARCHAR" property="blogCategoryName"/>
+        <result column="blog_content" property="blogContent"/>
         <result column="blog_tags" jdbcType="VARCHAR" property="blogTags"/>
         <result column="blog_status" jdbcType="TINYINT" property="blogStatus"/>
         <result column="blog_views" jdbcType="BIGINT" property="blogViews"/>
@@ -16,7 +17,26 @@
         <result column="create_time" jdbcType="TIMESTAMP" property="createTime"/>
         <result column="update_time" jdbcType="TIMESTAMP" property="updateTime"/>
     </resultMap>
+    <select id="getTotal" resultType="int">
+        select count(*) from tb_blog
+        where is_deleted=0
+    </select>
 
+    <select id="selectById" resultMap="BaseResultMap">
+        select * from tb_blog
+        where is_deleted=0 and blog_id=#{blogId}
+    </select>
+
+    <delete id="deleteBlogById">
+        delete from tb_blog
+        where blog_id=#{blogId}
+    </delete>
+
+    <select id="findBlogList" resultMap="BaseResultMap">
+        select * from tb_blog
+        where is_deleted=0
+        limit #{start},#{limit}
+    </select>
 
     <insert id="insertBlog" useGeneratedKeys="true" keyProperty="blogId"
             parameterType="com.cl.smyblog.entity.Blog">

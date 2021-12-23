@@ -2,6 +2,7 @@ package com.cl.smyblog.contorller.admin;
 import com.cl.smyblog.entity.Blog;
 import com.cl.smyblog.service.BlogService;
 import com.cl.smyblog.service.CategoryService;
+import com.cl.smyblog.util.PageQueryUtil;
 import com.cl.smyblog.util.Result;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -17,6 +18,7 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.Map;
 import java.util.Random;
 
 @Controller
@@ -27,6 +29,46 @@ public class BlogController {
     private BlogService blogService;
     @Autowired
     private CategoryService categoryService;
+
+    @GetMapping("/blogs")
+    public String blogs(HttpServletRequest request) {
+        request.setAttribute("path", "blogs");
+        return "admin/blog";
+    }
+
+    @GetMapping("/blogs/list")
+    @ResponseBody
+    public Result list(@RequestParam Map<String,Object> params){
+        if( StringUtils.isEmpty(params.get("page")) || StringUtils.isEmpty(params.get("limit"))){
+            return Result.fail(400,"参数异常");
+        }
+        PageQueryUtil pageQueryUtil = new PageQueryUtil(params);
+        return Result.success( blogService.getBlogPage(pageQueryUtil) );
+    }
+
+    @GetMapping("/blogs/edit/{blogId}")
+    public String edit(HttpServletRequest request,
+                       @PathVariable("blogId") Long blogId){
+        request.setAttribute("path","edit");
+        Blog blog = blogService.getBlogById( blogId );
+        if( blog==null ){
+            return "error/error_400";
+        }
+        request.setAttribute("blog",blog );
+        request.setAttribute("categories",categoryService.getAllCategories() );
+        return "admin/edit";
+    }
+
+    @PostMapping("blogs/delete")
+    @ResponseBody
+    public Result deleteBlog( @RequestBody Integer[] ids ){
+        if( ids.length<1 )  return Result.fail(400,"参数错误");
+        if( blogService.deleteBatch(ids) ){
+            return Result.success(null);
+        }else{
+            return Result.fail(400,"删除失败");
+        }
+    }
 
     @GetMapping("/blogs/edit")
     public String edit(HttpServletRequest request) {
@@ -64,6 +106,59 @@ public class BlogController {
         response.setHeader("Content-Type","text.html");
         response.getWriter().write("{\"success\": 1, \"message\":\"success\",\"url\":\"" + fileUrl + "\"}");
 
+    }
+
+    @PostMapping("/blogs/update")
+    @ResponseBody
+    public Result update(@RequestParam("blogId") Long blogId,
+                         @RequestParam("blogTitle") String blogTitle,
+                         @RequestParam(name = "blogSubUrl", required = false) String blogSubUrl,
+                         @RequestParam("blogCategoryId") Integer blogCategoryId,
+                         @RequestParam("blogTags") String blogTags,
+                         @RequestParam("blogContent") String blogContent,
+                         @RequestParam("blogCoverImage") String blogCoverImage,
+                         @RequestParam("blogStatus") Byte blogStatus,
+                         @RequestParam("enableComment") Byte enableComment) {
+        if(StringUtils.isEmpty(blogTitle) ){
+            return Result.fail(400,"请输入文章标题");
+        }
+        if (blogTitle.trim().length() > 150) {
+            return Result.fail(400,"标题过长");
+        }
+        if (StringUtils.isEmpty(blogTags)) {
+            return Result.fail(400,"请输入文章标签");
+        }
+        if (blogTags.trim().length() > 150) {
+            return Result.fail(400,"标签过长");
+        }
+        if (blogSubUrl.trim().length() > 150) {
+            return Result.fail(400,"路径过长");
+        }
+        if (StringUtils.isEmpty(blogContent)) {
+            return Result.fail(400,"请输入文章内容");
+        }
+        if (blogTags.trim().length() > 100000) {
+            return Result.fail(400,"文章内容过长");
+        }
+        if (StringUtils.isEmpty(blogCoverImage)) {
+            return Result.fail(400,"封面图不能为空");
+        }
+        Blog blog = new Blog();
+        blog.setBlogId(blogId);
+        blog.setBlogTitle(blogTitle);
+        blog.setBlogSubUrl(blogSubUrl);
+        blog.setBlogCategoryId(blogCategoryId);
+        blog.setBlogTags(blogTags);
+        blog.setBlogContent(blogContent);
+        blog.setBlogCoverImage(blogCoverImage);
+        blog.setBlogStatus(blogStatus);
+        blog.setEnableComment(enableComment);
+        String updateBlogResult = blogService.updateBlog(blog);
+        if ("success".equals(updateBlogResult)) {
+            return Result.success("修改成功");
+        } else {
+            return Result.fail(400,updateBlogResult);
+        }
     }
 
     @PostMapping("/blogs/save")//保存博客内容
@@ -116,6 +211,8 @@ public class BlogController {
             return Result.fail(400,message);
         }
     }
+
+
 
     public static String getUriPrefix( URI uri ){
         return uri.getScheme() + "://" + uri.getHost() + ":"+uri.getPort();
